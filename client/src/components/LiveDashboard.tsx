@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { ApplicationAssistant } from "@/components/ApplicationAssistant";
 import { trpc } from "@/lib/trpc";
 import {
@@ -18,6 +19,7 @@ import {
   ScanSearch,
   ShieldCheck,
   Sparkles,
+  Target,
   Waves,
   X,
 } from "lucide-react";
@@ -40,6 +42,7 @@ function formatClock(date: Date) {
 }
 
 export default function LiveDashboard() {
+  const { isAuthenticated } = useAuth();
   const [botActive, setBotActive] = useState(true);
   const [scanRunning, setScanRunning] = useState(false);
   const [lastScan, setLastScan] = useState(() => new Date());
@@ -48,6 +51,8 @@ export default function LiveDashboard() {
   const [scanCount, setScanCount] = useState(3);
   const [assistantOpen, setAssistantOpen] = useState(false);
   const assistantStatus = trpc.assistant.status.useQuery(undefined, { staleTime: 30_000 });
+  const workspaceSummary = trpc.assistant.summary.useQuery(undefined, { enabled: isAuthenticated, staleTime: 15_000 });
+  const hasWorkspaceError = workspaceSummary.isError;
 
   useEffect(() => {
     if (!botActive) return;
@@ -62,6 +67,26 @@ export default function LiveDashboard() {
   }, [toast]);
 
   const lastScanLabel = useMemo(() => formatClock(lastScan), [lastScan]);
+  const draftCount = workspaceSummary.data?.drafts ?? 0;
+  const approvedCount = workspaceSummary.data?.approved ?? 0;
+  const workspaceAction = hasWorkspaceError ? {
+    title: "Arbeitsraum erneut abgleichen",
+    detail: "Die gespeicherten Entwürfe konnten gerade nicht geladen werden. Der übrige Simulationsmodus bleibt unverändert.",
+    boundary: "Beim erneuten Abgleich wird keine externe Aktion ausgelöst.",
+  } : workspaceSummary.data?.nextAction ?? {
+    title: isAuthenticated ? "Arbeitsraum wird abgeglichen" : "Geschützten Arbeitsraum öffnen",
+    detail: isAuthenticated
+      ? "Gespeicherte Entwürfe werden für Ihr persönliches Lagebild geladen."
+      : "Melden Sie sich an, um Entwürfe, Prüfungen und Freigaben in Ihrem Arbeitsraum zu verwalten.",
+    boundary: "Keine Bewerbung oder Übertragung wird automatisch ausgelöst.",
+  };
+  const workspaceMetricNote = hasWorkspaceError
+    ? "Arbeitsraum erneut abgleichen"
+    : draftCount === 0
+      ? "keine offene Prüfung"
+      : draftCount === 1
+        ? "wartet auf Freigabe"
+        : "warten auf Ihre Prüfung";
 
   const runScan = () => {
     if (scanRunning) return;
@@ -76,6 +101,13 @@ export default function LiveDashboard() {
   };
 
   const openApprovals = () => setAssistantOpen(true);
+  const handleWorkspaceAction = () => {
+    if (hasWorkspaceError) {
+      void workspaceSummary.refetch();
+      return;
+    }
+    openApprovals();
+  };
 
   return (
     <div className="dashboard-app">
@@ -147,7 +179,7 @@ export default function LiveDashboard() {
 
         <section className="metric-strip" aria-label="Systemkennzahlen">
           <div className="metric-cell"><span className="metric-label">PROGRAMME KATALOGISIERT</span><strong>{scanCount}</strong><span className="metric-note"><span className="trend-up">+3</span> seit letzter Prüfung</span></div>
-          <div className="metric-cell"><span className="metric-label">ENTWÜRFE IN PRÜFUNG</span><strong>01</strong><span className="metric-note metric-amber"><Clock3 size={13} /> wartet auf Freigabe</span></div>
+          <div className="metric-cell"><span className="metric-label">ENTWÜRFE IN PRÜFUNG</span><strong>{workspaceSummary.isLoading ? "—" : String(draftCount).padStart(2, "0")}</strong><span className={`metric-note ${hasWorkspaceError || draftCount > 0 ? "metric-amber" : ""}`}><Clock3 size={13} /> {workspaceMetricNote}</span></div>
           <div className="metric-cell"><span className="metric-label">TRACKING-LINKS</span><strong>00</strong><span className="metric-note">Simulation · keine Live-Links</span></div>
           <div className="metric-cell metric-last"><span className="metric-label">OPENROUTER</span><strong className="metric-word"><span className={`status-hollow-dot ${assistantStatus.data?.configured ? "status-solid-dot" : ""}`} /> {assistantStatus.data?.configured ? "bereit" : "geschützt"}</strong><span className="metric-note">{assistantStatus.data?.configured ? assistantStatus.data.model : "Schlüssel noch nicht hinterlegt"}</span></div>
         </section>
@@ -178,6 +210,16 @@ export default function LiveDashboard() {
                 </div>
               ))}
             </div>
+
+            <section className="workspace-section" aria-label="Arbeitsfokus">
+              <div className="section-heading workspace-heading"><div><span className="section-index">03 /</span><h2>Arbeitsfokus</h2></div><span className="section-caption">GESPEICHERTER ARBEITSRAUM</span></div>
+              <div className={`workspace-card ${hasWorkspaceError ? "workspace-card-error" : ""}`}>
+                <div className="workspace-card-head"><span className="workspace-icon"><Target size={17} /></span><div><span className="card-kicker">NÄCHSTE KLARE HANDLUNG</span><h3>{workspaceAction.title}</h3></div><span className={`stamp ${hasWorkspaceError || draftCount > 0 ? "stamp-amber" : "stamp-green"}`}><i />{workspaceSummary.isLoading ? "ABGLEICH" : hasWorkspaceError ? "HINWEIS" : draftCount > 0 ? "PRÜFUNG" : "BEREIT"}</span></div>
+                <p>{workspaceAction.detail}</p>
+                <div className="workspace-stats"><span><strong>{String(draftCount).padStart(2, "0")}</strong> offene Entwürfe</span><span><strong>{String(approvedCount).padStart(2, "0")}</strong> intern freigegeben</span><span><ShieldCheck size={14} /> {workspaceAction.boundary}</span></div>
+                <button className="workspace-action" onClick={handleWorkspaceAction}>{hasWorkspaceError ? "Erneut abgleichen" : "Arbeitsraum prüfen"} <ArrowUpRight size={15} /></button>
+              </div>
+            </section>
           </section>
 
           <aside className="side-column">

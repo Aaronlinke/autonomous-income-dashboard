@@ -6,6 +6,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { createAffiliateDraft, listAffiliateDrafts, setAffiliateDraftStatus } from "./db";
 import { applicationRequestSchema, generateApplicationDraft, getOpenRouterStatus } from "./openrouter";
+import { summarizeWorkspace } from "./workspaceSummary";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -23,6 +24,7 @@ export const appRouter = router({
   assistant: router({
     status: publicProcedure.query(() => getOpenRouterStatus()),
     listDrafts: protectedProcedure.query(({ ctx }) => listAffiliateDrafts(ctx.user.id)),
+    summary: protectedProcedure.query(async ({ ctx }) => summarizeWorkspace(await listAffiliateDrafts(ctx.user.id))),
     generateDraft: protectedProcedure.input(applicationRequestSchema).mutation(async ({ ctx, input }) => {
       try {
         const generated = await generateApplicationDraft(input, ctx.user.id);
