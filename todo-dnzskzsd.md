@@ -28,4 +28,4 @@
 - [x] Kennzahlen-Text für den Zustand ohne offene Entwürfe korrekt darstellen.
 - [x] Einen verständlichen Fehlerzustand für die Arbeitsraumübersicht ergänzen und visuell erneut prüfen.
 - [x] Arbeitsraum-Fehlerzustand gezielt auslösen und die fehlerhafte Ansicht anschließend visuell erneut prüfen.
-- [ ] Einen finalen Projekt-Checkpoint für Entwurfsvergleich und persönliche Filtervorlagen erstellen.
+- [x] Einen finalen Projekt-Checkpoint für Entwurfsvergleich und persönliche Filtervorlagen erstellen.
