@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { ApplicationAssistant } from "@/components/ApplicationAssistant";
+import { DraftHistorySheet } from "@/components/DraftHistorySheet";
+import { CatalogProgram, ProgramDetailSheet } from "@/components/ProgramDetailSheet";
 import { trpc } from "@/lib/trpc";
 import {
   ArrowUpRight,
@@ -24,10 +26,10 @@ import {
   X,
 } from "lucide-react";
 
-const programs = [
-  { name: "Everflow-Demo-Netzwerk", category: "Software & Tools", status: "Entwurf", tone: "amber", mark: "EF" },
-  { name: "Impact-Programm-Katalog", category: "Marktplatz", status: "Entdeckt", tone: "ink", mark: "IM" },
-  { name: "Awin-Programm-Katalog", category: "E-Commerce", status: "Entdeckt", tone: "ink", mark: "AW" },
+const programs: CatalogProgram[] = [
+  { name: "Everflow-Demo-Netzwerk", category: "Software & Tools", status: "Entwurf", tone: "amber", mark: "EF", summary: "Katalogeintrag für eine mögliche Partnerschaft im Bereich Software und Tools. Der Eintrag dient der internen Vorbereitung und ersetzt keine Programmbewerbung.", reviewFocus: "Profil, Zielgruppe und vorgesehene Kanäle auf Passung prüfen.", disclosure: "Sichtbarer Affiliate-Hinweis ist als Pflichtbestandteil vorgesehen.", nextStep: "Bewerbungsentwurf im geschützten Arbeitsraum prüfen." },
+  { name: "Impact-Programm-Katalog", category: "Marktplatz", status: "Entdeckt", tone: "ink", mark: "IM", summary: "Katalogeintrag aus dem Bereich Marktplätze. Die Recherche hält die Quelle als Kandidat fest, ohne eine Kommunikation oder Registrierung anzustoßen.", reviewFocus: "Kategorie, beabsichtigten Nutzen und mögliche Offenlegung einordnen.", disclosure: "Vor jeder öffentlichen Empfehlung sichtbar planen.", nextStep: "Profilinformationen ergänzen und einen Entwurf vorbereiten." },
+  { name: "Awin-Programm-Katalog", category: "E-Commerce", status: "Entdeckt", tone: "ink", mark: "AW", summary: "Katalogeintrag im E-Commerce-Kontext. Er macht eine mögliche Gelegenheit nachvollziehbar, ohne aus der Übersicht eine externe Aktion abzuleiten.", reviewFocus: "Zielgruppe, thematische Relevanz und Inhaltsidee sachlich abgleichen.", disclosure: "Für alle späteren Empfehlungsinhalte verbindlich vorsehen.", nextStep: "Inhaltsplan skizzieren und die interne Prüfung starten." },
 ];
 
 const auditEntries = [
@@ -50,6 +52,8 @@ export default function LiveDashboard() {
   const [toast, setToast] = useState("");
   const [scanCount, setScanCount] = useState(3);
   const [assistantOpen, setAssistantOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState<CatalogProgram | null>(null);
   const assistantStatus = trpc.assistant.status.useQuery(undefined, { staleTime: 30_000 });
   const workspaceSummary = trpc.assistant.summary.useQuery(undefined, { enabled: isAuthenticated, staleTime: 15_000 });
   const hasWorkspaceError = workspaceSummary.isError;
@@ -206,7 +210,7 @@ export default function LiveDashboard() {
                   <div className="program-name"><span className={`program-monogram monogram-${program.tone}`}>{program.mark}</span><strong>{program.name}</strong></div>
                   <span className="program-category">{program.category}</span>
                   <span className={`stamp stamp-${program.tone}`}><i />{program.status}</span>
-                  <button className="row-arrow" aria-label={`${program.name} öffnen`}><ArrowUpRight size={15} /></button>
+                  <button className="row-arrow" aria-label={`${program.name} öffnen`} onClick={() => setSelectedProgram(program)}><ArrowUpRight size={15} /></button>
                 </div>
               ))}
             </div>
@@ -217,7 +221,7 @@ export default function LiveDashboard() {
                 <div className="workspace-card-head"><span className="workspace-icon"><Target size={17} /></span><div><span className="card-kicker">NÄCHSTE KLARE HANDLUNG</span><h3>{workspaceAction.title}</h3></div><span className={`stamp ${hasWorkspaceError || draftCount > 0 ? "stamp-amber" : "stamp-green"}`}><i />{workspaceSummary.isLoading ? "ABGLEICH" : hasWorkspaceError ? "HINWEIS" : draftCount > 0 ? "PRÜFUNG" : "BEREIT"}</span></div>
                 <p>{workspaceAction.detail}</p>
                 <div className="workspace-stats"><span><strong>{String(draftCount).padStart(2, "0")}</strong> offene Entwürfe</span><span><strong>{String(approvedCount).padStart(2, "0")}</strong> intern freigegeben</span><span><ShieldCheck size={14} /> {workspaceAction.boundary}</span></div>
-                <button className="workspace-action" onClick={handleWorkspaceAction}>{hasWorkspaceError ? "Erneut abgleichen" : "Arbeitsraum prüfen"} <ArrowUpRight size={15} /></button>
+                <div className="workspace-actions"><button className="workspace-action" onClick={handleWorkspaceAction}>{hasWorkspaceError ? "Erneut abgleichen" : "Arbeitsraum prüfen"} <ArrowUpRight size={15} /></button><button className="workspace-action workspace-action-secondary" onClick={() => setHistoryOpen(true)}>Historie durchsuchen <ArrowUpRight size={15} /></button></div>
               </div>
             </section>
           </section>
@@ -249,6 +253,8 @@ export default function LiveDashboard() {
       </main>
 
       <ApplicationAssistant open={assistantOpen} onClose={() => setAssistantOpen(false)} />
+      <ProgramDetailSheet program={selectedProgram} onClose={() => setSelectedProgram(null)} onOpenAssistant={() => setAssistantOpen(true)} />
+      <DraftHistorySheet open={historyOpen} onClose={() => setHistoryOpen(false)} />
       {toast && <div className="toast-message" role="status"><span className="toast-check"><Check size={14} /></span>{toast}</div>}
     </div>
   );

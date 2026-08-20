@@ -1,7 +1,8 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, like, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { affiliateDrafts, InsertAffiliateDraft, InsertUser, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
+import { createLikePattern, DraftHistorySearch } from "./draftHistory";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -107,6 +108,34 @@ export async function listAffiliateDrafts(userId: number) {
     .where(eq(affiliateDrafts.userId, userId))
     .orderBy(desc(affiliateDrafts.updatedAt))
     .limit(20);
+}
+
+export async function searchAffiliateDrafts(
+  userId: number,
+  search: DraftHistorySearch,
+  dbOverride?: NonNullable<Awaited<ReturnType<typeof getDb>>>,
+) {
+  const db = dbOverride ?? await getDb();
+  if (!db) throw new Error("Entwurfsablage ist derzeit nicht verfügbar.");
+
+  const conditions = [eq(affiliateDrafts.userId, userId)];
+  if (search.status !== "all") conditions.push(eq(affiliateDrafts.status, search.status));
+  if (search.query) {
+    const pattern = createLikePattern(search.query);
+    const matchingFields = or(
+      like(affiliateDrafts.programName, pattern),
+      like(affiliateDrafts.programCategory, pattern),
+      like(affiliateDrafts.website, pattern),
+      like(affiliateDrafts.audience, pattern),
+      like(affiliateDrafts.generatedDraft, pattern),
+    );
+    if (matchingFields) conditions.push(matchingFields);
+  }
+
+  return db.select().from(affiliateDrafts)
+    .where(and(...conditions))
+    .orderBy(desc(affiliateDrafts.updatedAt))
+    .limit(100);
 }
 
 export async function setAffiliateDraftStatus(userId: number, draftId: number, status: "approved" | "archived") {

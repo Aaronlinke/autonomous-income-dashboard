@@ -6,6 +6,14 @@
 - [x] Tests für die neu hinzugefügte Logik erstellen oder aktualisieren und die Projektprüfung erfolgreich ausführen.
 - [x] Die fertige additive Weiterentwicklung visuell prüfen und in einer neuen Projektversion sichern.
 - [x] Abschließenden Projekt-Checkpoint nach dem final geprüften Stand erstellen und die neue Version bereitstellen.
+- [x] Vorhandene Programmübersicht um eine zugängliche Detailansicht mit spezifischen Informationen und klarer Handlungsgrenze erweitern.
+- [x] Gespeicherte Entwürfe in einer durchsuchbaren, filterbaren Historie mit Status, Programm und Zeitstempel darstellen.
+- [x] Datenzugriff, Such- und Filterlogik mit Unit-Tests sowie die neuen Ansichten in Desktop- und Mobilansicht prüfen.
+- [x] Den serverseitigen Suchzugriff der Entwurfshistorie mit einer kontrollierten Datenbank-Query-Kette testen.
+- [x] Programmdetailansicht und Entwurfshistorie im geöffneten mobilen Zustand gezielt visuell prüfen.
+- [x] Die serverseitige Query-Kette der Entwurfshistorie für Nutzer-, Status-, Textfilter und Sortierung detailliert verifizieren.
+- [x] Die Erweiterung nach erfolgreicher Prüfung als neue Projektversion sichern.
+- [ ] Einen finalen Projekt-Checkpoint für Programmdetailansichten und durchsuchbare Entwurfshistorie erstellen.
 - [x] Gespeicherte Entwürfe zu einer geschützten Arbeitsraumübersicht mit Statuszahlen und nächster interner Handlung zusammenfassen.
 - [x] Die neue Arbeitsraumübersicht als ergänzenden Bereich im bestehenden Lagebild sichtbar und responsiv einbinden.
 - [x] Die Statuszusammenfassung mit fokussierten Unit-Tests für leere, prüfbare und intern freigegebene Entwürfe absichern.
