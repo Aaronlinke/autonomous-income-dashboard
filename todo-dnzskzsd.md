@@ -29,3 +29,9 @@
 - [x] Einen verständlichen Fehlerzustand für die Arbeitsraumübersicht ergänzen und visuell erneut prüfen.
 - [x] Arbeitsraum-Fehlerzustand gezielt auslösen und die fehlerhafte Ansicht anschließend visuell erneut prüfen.
 - [x] Einen finalen Projekt-Checkpoint für Entwurfsvergleich und persönliche Filtervorlagen erstellen.
+- [x] Ursache der React-Render-Schleife mit maximaler Aktualisierungstiefe im Dashboard identifizieren.
+- [x] Betroffene Zustandsaktualisierung gegen wiederholte Renderzyklen absichern.
+- [x] Behebung mit Tests, Browser-Konsole und visueller Dashboard-Prüfung verifizieren.
+- [x] Browser-Konsole nach der Fehlerbehebung in einem frischen Seitenaufruf eindeutig auf fehlende Render-Schleifen prüfen.
+- [x] Korrigierte Fehlerbehebung als neue Projektversion sichern.
+- [ ] Einen finalen Projekt-Checkpoint für die Render-Schleifen-Behebung erstellen.

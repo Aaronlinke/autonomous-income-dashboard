@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { summarizeDraftDifferences } from "./draftComparison";
+import { reconcileSelectedDraftIds, summarizeDraftDifferences } from "./draftComparison";
 
 const baseDraft = {
   id: 1,
@@ -24,5 +24,15 @@ describe("summarizeDraftDifferences", () => {
       contentPlan: "Ausführlicher Vergleich mit Beispielen",
       generatedDraft: "Überarbeiteter transparenter Entwurf.",
     })).toEqual(["Status", "Inhaltsplan", "Entwurfstext"]);
+  });
+
+  it("behält die vorhandene Auswahlreferenz, wenn alle ausgewählten Entwürfe noch verfügbar sind", () => {
+    const selected = [4, 9];
+
+    expect(reconcileSelectedDraftIds(selected, [4, 9, 12])).toBe(selected);
+  });
+
+  it("entfernt nur Auswahlen, die nicht mehr in den Suchergebnissen enthalten sind", () => {
+    expect(reconcileSelectedDraftIds([4, 9], [9, 12])).toEqual([9]);
   });
 });

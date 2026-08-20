@@ -1,6 +1,7 @@
 import { startLogin } from "@/const";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
+import { reconcileSelectedDraftIds } from "@/lib/draftComparison";
 import { DraftComparisonSheet } from "@/components/DraftComparisonSheet";
 import { AlertTriangle, Check, FileText, GitCompareArrows, Loader2, Save, Search, SlidersHorizontal, Trash2, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -81,7 +82,7 @@ export function DraftHistorySheet({ open, onClose }: DraftHistorySheetProps) {
   const selectedDrafts = drafts.filter((draft) => selectedDraftIds.includes(draft.id));
 
   useEffect(() => {
-    setSelectedDraftIds((current) => current.filter((id) => drafts.some((draft) => draft.id === id)));
+    setSelectedDraftIds((current) => reconcileSelectedDraftIds(current, drafts.map((draft) => draft.id)));
   }, [drafts]);
 
   if (!open) return null;

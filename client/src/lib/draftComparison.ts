@@ -21,3 +21,9 @@ export function summarizeDraftDifferences(left: ComparableDraft, right: Comparab
     .filter((field) => left[field.key] !== right[field.key])
     .map((field) => field.label);
 }
+
+export function reconcileSelectedDraftIds(current: number[], availableIds: readonly number[]) {
+  const available = new Set(availableIds);
+  const next = current.filter((id) => available.has(id));
+  return next.length === current.length ? current : next;
+}
