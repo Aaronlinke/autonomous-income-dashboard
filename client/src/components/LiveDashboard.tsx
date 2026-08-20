@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import { ApplicationAssistant } from "@/components/ApplicationAssistant";
+import { trpc } from "@/lib/trpc";
 import {
   ArrowUpRight,
   Bot,
@@ -44,6 +46,8 @@ export default function LiveDashboard() {
   const [mobileNav, setMobileNav] = useState(false);
   const [toast, setToast] = useState("");
   const [scanCount, setScanCount] = useState(3);
+  const [assistantOpen, setAssistantOpen] = useState(false);
+  const assistantStatus = trpc.assistant.status.useQuery(undefined, { staleTime: 30_000 });
 
   useEffect(() => {
     if (!botActive) return;
@@ -71,7 +75,7 @@ export default function LiveDashboard() {
     }, 950);
   };
 
-  const openApprovals = () => setToast("Freigabe-Center ist vorbereitet · 1 Entwurf wartet auf Prüfung.");
+  const openApprovals = () => setAssistantOpen(true);
 
   return (
     <div className="dashboard-app">
@@ -99,7 +103,7 @@ export default function LiveDashboard() {
         <nav className="side-nav">
           <button className="nav-item"><ShieldCheck size={17} /><span>Compliance</span></button>
           <button className="nav-item"><LockKeyhole size={17} /><span>Zugänge</span><span className="nav-dot" /></button>
-          <button className="nav-item"><Sparkles size={17} /><span>OpenRouter</span><span className="nav-dot nav-dot-amber" /></button>
+          <button className="nav-item" onClick={openApprovals}><Sparkles size={17} /><span>OpenRouter</span><span className={`nav-dot ${assistantStatus.data?.configured ? "" : "nav-dot-amber"}`} /></button>
         </nav>
 
         <div className="rail-footer">
@@ -145,7 +149,7 @@ export default function LiveDashboard() {
           <div className="metric-cell"><span className="metric-label">PROGRAMME KATALOGISIERT</span><strong>{scanCount}</strong><span className="metric-note"><span className="trend-up">+3</span> seit letzter Prüfung</span></div>
           <div className="metric-cell"><span className="metric-label">ENTWÜRFE IN PRÜFUNG</span><strong>01</strong><span className="metric-note metric-amber"><Clock3 size={13} /> wartet auf Freigabe</span></div>
           <div className="metric-cell"><span className="metric-label">TRACKING-LINKS</span><strong>00</strong><span className="metric-note">Simulation · keine Live-Links</span></div>
-          <div className="metric-cell metric-last"><span className="metric-label">OPENROUTER</span><strong className="metric-word"><span className="status-hollow-dot" /> geschützt</strong><span className="metric-note">Schlüssel noch nicht hinterlegt</span></div>
+          <div className="metric-cell metric-last"><span className="metric-label">OPENROUTER</span><strong className="metric-word"><span className={`status-hollow-dot ${assistantStatus.data?.configured ? "status-solid-dot" : ""}`} /> {assistantStatus.data?.configured ? "bereit" : "geschützt"}</strong><span className="metric-note">{assistantStatus.data?.configured ? assistantStatus.data.model : "Schlüssel noch nicht hinterlegt"}</span></div>
         </section>
 
         <div className="content-grid">
@@ -202,6 +206,7 @@ export default function LiveDashboard() {
         <footer className="dashboard-footer"><span><span className="footer-lock"><LockKeyhole size={12} /></span> SICHERE SIMULATION · v0.8.4</span><span>Automatisierung bleibt erklärbar.</span><span>Letzter Abgleich {lastScanLabel} Uhr</span></footer>
       </main>
 
+      <ApplicationAssistant open={assistantOpen} onClose={() => setAssistantOpen(false)} />
       {toast && <div className="toast-message" role="status"><span className="toast-check"><Check size={14} /></span>{toast}</div>}
     </div>
   );
