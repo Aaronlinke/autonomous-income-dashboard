@@ -13,7 +13,7 @@
 - [x] Programmdetailansicht und Entwurfshistorie im geöffneten mobilen Zustand gezielt visuell prüfen.
 - [x] Die serverseitige Query-Kette der Entwurfshistorie für Nutzer-, Status-, Textfilter und Sortierung detailliert verifizieren.
 - [x] Die Erweiterung nach erfolgreicher Prüfung als neue Projektversion sichern.
-- [ ] Einen finalen Projekt-Checkpoint für Programmdetailansichten und durchsuchbare Entwurfshistorie erstellen.
+- [x] Einen finalen Projekt-Checkpoint für Programmdetailansichten und durchsuchbare Entwurfshistorie erstellen.
 - [x] Gespeicherte Entwürfe zu einer geschützten Arbeitsraumübersicht mit Statuszahlen und nächster interner Handlung zusammenfassen.
 - [x] Die neue Arbeitsraumübersicht als ergänzenden Bereich im bestehenden Lagebild sichtbar und responsiv einbinden.
 - [x] Die Statuszusammenfassung mit fokussierten Unit-Tests für leere, prüfbare und intern freigegebene Entwürfe absichern.
