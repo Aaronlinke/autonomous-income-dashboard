@@ -45,3 +45,15 @@ export const affiliateDrafts = mysqlTable("affiliateDrafts", {
 
 export type AffiliateDraft = typeof affiliateDrafts.$inferSelect;
 export type InsertAffiliateDraft = typeof affiliateDrafts.$inferInsert;
+
+export const savedDraftFilters = mysqlTable("savedDraftFilters", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id),
+  name: varchar("name", { length: 80 }).notNull(),
+  query: varchar("query", { length: 120 }).notNull().default(""),
+  status: mysqlEnum("status", ["all", "draft", "approved", "archived"]).default("all").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type SavedDraftFilter = typeof savedDraftFilters.$inferSelect;
+export type InsertSavedDraftFilter = typeof savedDraftFilters.$inferInsert;

@@ -1,8 +1,8 @@
 import { and, desc, eq, like, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { affiliateDrafts, InsertAffiliateDraft, InsertUser, users } from "../drizzle/schema";
+import { affiliateDrafts, InsertAffiliateDraft, InsertUser, savedDraftFilters, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
-import { createLikePattern, DraftHistorySearch } from "./draftHistory";
+import { createLikePattern, DraftHistorySearch, SavedDraftFilterInput } from "./draftHistory";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -136,6 +136,45 @@ export async function searchAffiliateDrafts(
     .where(and(...conditions))
     .orderBy(desc(affiliateDrafts.updatedAt))
     .limit(100);
+}
+
+export async function listSavedDraftFilters(
+  userId: number,
+  dbOverride?: NonNullable<Awaited<ReturnType<typeof getDb>>>,
+) {
+  const db = dbOverride ?? await getDb();
+  if (!db) throw new Error("Filterablage ist derzeit nicht verfügbar.");
+  return db.select().from(savedDraftFilters)
+    .where(eq(savedDraftFilters.userId, userId))
+    .orderBy(desc(savedDraftFilters.createdAt))
+    .limit(30);
+}
+
+export async function createSavedDraftFilter(
+  userId: number,
+  input: SavedDraftFilterInput,
+  dbOverride?: NonNullable<Awaited<ReturnType<typeof getDb>>>,
+) {
+  const db = dbOverride ?? await getDb();
+  if (!db) throw new Error("Filterablage ist derzeit nicht verfügbar.");
+  await db.insert(savedDraftFilters).values({ userId, name: input.name, query: input.query, status: input.status });
+  const rows = await db.select().from(savedDraftFilters)
+    .where(and(eq(savedDraftFilters.userId, userId), eq(savedDraftFilters.name, input.name)))
+    .orderBy(desc(savedDraftFilters.createdAt))
+    .limit(1);
+  return rows[0];
+}
+
+export async function deleteSavedDraftFilter(
+  userId: number,
+  filterId: number,
+  dbOverride?: NonNullable<Awaited<ReturnType<typeof getDb>>>,
+) {
+  const db = dbOverride ?? await getDb();
+  if (!db) throw new Error("Filterablage ist derzeit nicht verfügbar.");
+  await db.delete(savedDraftFilters)
+    .where(and(eq(savedDraftFilters.id, filterId), eq(savedDraftFilters.userId, userId)));
+  return { success: true } as const;
 }
 
 export async function setAffiliateDraftStatus(userId: number, draftId: number, status: "approved" | "archived") {

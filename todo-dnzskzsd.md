@@ -14,9 +14,18 @@
 - [x] Die serverseitige Query-Kette der Entwurfshistorie für Nutzer-, Status-, Textfilter und Sortierung detailliert verifizieren.
 - [x] Die Erweiterung nach erfolgreicher Prüfung als neue Projektversion sichern.
 - [x] Einen finalen Projekt-Checkpoint für Programmdetailansichten und durchsuchbare Entwurfshistorie erstellen.
+- [x] Bestehende Entwurfshistorie um eine Auswahl und eine direkte Vergleichsansicht für zwei gespeicherte Entwürfe erweitern.
+- [x] Persönliche Suchfilter der Entwurfshistorie mit Name, Textsuche und Status sicher pro Nutzer speichern, laden und entfernen.
+- [x] Vergleichs- und Filterlogik mit Unit-Tests sowie Desktop- und Mobilansicht prüfen.
+- [x] Ladefehler gespeicherter Filter verständlich in der Entwurfshistorie anzeigen.
+- [x] Für das Speichern und Löschen gespeicherter Filter sichtbare Erfolgs- und Fehlerhinweise ergänzen.
+- [x] Die Fehler- und Rückmeldungszustände gespeicherter Filter erneut in Desktop- und Mobilansicht prüfen.
+- [x] Filter-Fehler- und Erfolgsrückmeldungen auch im geöffneten Desktop-Zustand gezielt visuell prüfen.
+- [x] Die Erweiterung nach erfolgreicher Prüfung als neue Projektversion sichern.
 - [x] Gespeicherte Entwürfe zu einer geschützten Arbeitsraumübersicht mit Statuszahlen und nächster interner Handlung zusammenfassen.
 - [x] Die neue Arbeitsraumübersicht als ergänzenden Bereich im bestehenden Lagebild sichtbar und responsiv einbinden.
 - [x] Die Statuszusammenfassung mit fokussierten Unit-Tests für leere, prüfbare und intern freigegebene Entwürfe absichern.
 - [x] Kennzahlen-Text für den Zustand ohne offene Entwürfe korrekt darstellen.
 - [x] Einen verständlichen Fehlerzustand für die Arbeitsraumübersicht ergänzen und visuell erneut prüfen.
 - [x] Arbeitsraum-Fehlerzustand gezielt auslösen und die fehlerhafte Ansicht anschließend visuell erneut prüfen.
+- [ ] Einen finalen Projekt-Checkpoint für Entwurfsvergleich und persönliche Filtervorlagen erstellen.

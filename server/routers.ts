@@ -4,8 +4,8 @@ import { z } from "zod";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { createAffiliateDraft, listAffiliateDrafts, searchAffiliateDrafts, setAffiliateDraftStatus } from "./db";
-import { draftHistorySearchSchema } from "./draftHistory";
+import { createAffiliateDraft, createSavedDraftFilter, deleteSavedDraftFilter, listAffiliateDrafts, listSavedDraftFilters, searchAffiliateDrafts, setAffiliateDraftStatus } from "./db";
+import { draftHistorySearchSchema, savedDraftFilterIdSchema, savedDraftFilterSchema } from "./draftHistory";
 import { applicationRequestSchema, generateApplicationDraft, getOpenRouterStatus } from "./openrouter";
 import { summarizeWorkspace } from "./workspaceSummary";
 
@@ -27,6 +27,9 @@ export const appRouter = router({
     listDrafts: protectedProcedure.query(({ ctx }) => listAffiliateDrafts(ctx.user.id)),
     summary: protectedProcedure.query(async ({ ctx }) => summarizeWorkspace(await listAffiliateDrafts(ctx.user.id))),
     searchDrafts: protectedProcedure.input(draftHistorySearchSchema).query(({ ctx, input }) => searchAffiliateDrafts(ctx.user.id, input)),
+    listSavedFilters: protectedProcedure.query(({ ctx }) => listSavedDraftFilters(ctx.user.id)),
+    saveDraftFilter: protectedProcedure.input(savedDraftFilterSchema).mutation(({ ctx, input }) => createSavedDraftFilter(ctx.user.id, input)),
+    deleteSavedFilter: protectedProcedure.input(savedDraftFilterIdSchema).mutation(({ ctx, input }) => deleteSavedDraftFilter(ctx.user.id, input.id)),
     generateDraft: protectedProcedure.input(applicationRequestSchema).mutation(async ({ ctx, input }) => {
       try {
         const generated = await generateApplicationDraft(input, ctx.user.id);
